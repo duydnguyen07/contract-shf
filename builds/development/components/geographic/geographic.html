@@ -1,0 +1,48 @@
+<div class="col-sm-12" ng-controller="GeographicCtrl as contactFormCtrl">
+  <div ng-if="contactFormCtrl.geographic">
+    <label for="contactRegion">Region</label>
+    <select ng-required="contactFormCtrl.geographic" 
+        class="form-control" 
+        id="contactRegion" 
+        ng-model="contactFormCtrl.formService.region"
+        ng-change=contactFormCtrl.loadCountries(contactFormCtrl.formService.region)
+        >
+      <option value="North America">North America</option>
+      <option value="Europe">Europe</option>
+      <option value="Asia">Asia</option>
+      <option value="South America">South America</option>
+      <option value="Australia/Oceania">Australia/Oceania</option>
+      <option value="Caribbean">Caribbean</option>
+      <option value="Central America">Central America</option>
+      <option value="Islands">Islands</option>
+      <option value="Middle East">Middle East</option>
+      <option value="Africa">Africa</option>
+    </select>
+  </div>
+
+  <div ng-if="contactFormCtrl.countries">
+    <label for="contactRegion">Country</label>
+    <select 
+        ng-required="contactFormCtrl.geographic" 
+        class="form-control" 
+        id="contactRegion" 
+        ng-model="contactFormCtrl.formService.country"
+        ng-change="contactFormCtrl.loadCities(contactFormCtrl.formService.country)"
+        >
+      <option ng-repeat="country in contactFormCtrl.countries" 
+        ng-value="country">{{country}}</option>
+    </select>
+  </div>
+
+  <div ng-if="contactFormCtrl.cities">
+    <label for="contactRegion">City</label>
+    <select 
+      ng-required="contactFormCtrl.geographic" 
+      class="form-control" 
+      id="contactRegion" 
+      ng-model="contactFormCtrl.formService.city">
+      <option ng-repeat="city in contactFormCtrl.cities" 
+        ng-value="city">{{city}}</option>
+    </select>
+  </div>
+</div>

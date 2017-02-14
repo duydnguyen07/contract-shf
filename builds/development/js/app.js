@@ -28,9 +28,69 @@ var app =  angular.module('shf', [
 	'appControllers'
 	]);
 
+SHF.directivesModule.directive('geographic', function() {
+	return {
+		restrict: "E",
+		templateUrl: "components/geographic/geographic.html"
+	};
+});
 
-SHF.controllersModule.controller('AppCtrl', ['$scope', 'ModalService',  
-										function($scope, ModalService, close) {
+SHF.servicesModule.factory('ContactFormService', [function() {
+	var vm = {};
+
+	vm.init = function() {
+		vm.first_name = "";
+		vm.last_name = "";
+		vm.email = "";
+		vm.is_provider = "";
+		vm.region = "";
+		vm.country = "";
+		vm.city = "";
+	}
+
+	vm.init();
+
+	return vm;
+}]);
+
+SHF.controllersModule.controller('GeographicCtrl', ["$http", "ContactFormService", function($http, formService){
+	var vm = this;
+	vm.formService = formService;
+	vm.countries = null;
+	vm.cities = null;
+
+	vm.geographic = null;
+
+	$http.get("components/geographic/geographic_data.json").then(function successCB(resp) {
+			vm.geographic = resp.data;
+			vm.findDuplicates();
+		}, function errorCB(resp) {
+			console.log("ERROR: Failed loading geographic data", resp.data);
+		});
+
+
+	vm.findDuplicates = function() {
+		var cities = vm.geographic.cities;
+		Object.keys(cities).forEach(function(k) {
+			var currentCities = cities[k];
+
+			for (var i = 0; i < currentCities.length; i++) {
+				if(currentCities.lastIndexOf(currentCities[i]) !== i) console.log(currentCities[i]);
+			}
+		});
+	}
+
+	vm.loadCountries = function(region) {
+		vm.countries = vm.geographic.countries[region];
+	}
+
+	vm.loadCities = function(country) {
+		vm.cities = vm.geographic.cities[country];
+	}
+}]);
+
+SHF.controllersModule.controller('AppCtrl', ['$scope', 'ModalService', 
+										function($scope, ModalService) {
 	var vm = this;
 	
 	$scope.showContactForm = function() {
@@ -43,24 +103,32 @@ SHF.controllersModule.controller('AppCtrl', ['$scope', 'ModalService',
 	}
 }]);
 
-SHF.controllersModule.controller('ContactFormCtrl', ['$scope', '$element', 'close',  
-										function($scope, $element, close) {
+SHF.controllersModule.controller('ContactFormCtrl', ['$scope', '$element',  'ContactFormService', 'close',  
+										function($scope, $element, formService, close) {
 	var contacts = firebase.database().ref('contacts');
-	$scope.first_name = "";
-	$scope.last_name = "";
-	$scope.email = "";
+	$scope.submitted = false;
+	$scope.formService = formService;
+
+
 	$scope.submit = function(valid) {
 		if(valid) {
 			var data = {};
 			var newContactKey = contacts.push().key;
 			data[newContactKey] = {
-				first_name: $scope.first_name,
-				last_name: $scope.last_name,
-				email: $scope.email,
+				first_name: $scope.formService.first_name,
+				last_name: $scope.formService.last_name,
+				email: $scope.formService.email,
+				is_provider: $scope.formService.is_provider,
+				region: $scope.formService.region,
+				country: $scope.formService.country,
+				city: $scope.formService.city
 			}
 			
-			contacts.update(data); //debug
-			$scope.closeModal();
+			contacts.update(data);
+
+			formService.init(); //reinit to clear old data
+			$scope.submitted = true;
+			// $scope.closeModal();
 		}
 	}
 
@@ -71,4 +139,6 @@ SHF.controllersModule.controller('ContactFormCtrl', ['$scope', '$element', 'clos
 		$element.modal("hide");
 		close({}, 300);	
 	}
+
+
 }]);

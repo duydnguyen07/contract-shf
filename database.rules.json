@@ -9,6 +9,6 @@
     "$other": {
       ".write": false
     },
-    ".read": false,
+    ".read": false
   }
 }

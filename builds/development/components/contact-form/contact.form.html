@@ -6,31 +6,55 @@
         <h2 class="modal-title">Contact Us!</h2>
       </div>
       <div class="modal-body" >
-        
-        <form name="contactForm">
+        <div ng-show="submitted" >
+            Thank you for taking interest. We will be sure to keep you up to date!
+        </div>
+        <form name="contactForm" ng-show="!submitted">
           <div class="alert alert-danger" ng-show="contactForm.email.$invalid && !contactForm.email.$pristine">
             Please enter your information correctly.
           </div>
           <div class="form-group row">
             <div class="col-sm-6">
-              <input type="text" class="form-control" placeholder="First Name" name="first_name" ng-model="first_name">
+              <input type="text" 
+                class="form-control" 
+                placeholder="First Name" 
+                name="first_name" 
+                ng-model="formService.first_name"
+                required
+                ng-class="{'has-error': contactForm.first_name.$invalid && !contactForm.first_name.$pristine}"
+                >
             </div>
 
             <div class="col-sm-6">
-              <input type="text" class="form-control" placeholder="Last Name" name="last_name" ng-model="last_name">
+              <input type="text" class="form-control" placeholder="Last Name" name="last_name" ng-model="formService.last_name">
             </div>
           </div>
           <div class="form-group row">
             <div class="col-sm-12" 
               ng-class="{'has-error': contactForm.email.$invalid && !contactForm.email.$pristine}">
-              <input type="email" required class="form-control" placeholder="Email" name="email" ng-model="email" ng-model-options="{debounce: 300}">
+              <input type="email" required class="form-control" placeholder="Email" name="email" ng-model="formService.email" ng-model-options="{debounce: 300}">
             </div>
+          </div>
+          <div class="form-group row">
+            <div class="col-sm-12">
+              <label class="custom-control custom-checkbox">
+                <input type="checkbox" class="custom-control-input" ng-model="formService.is_provider">
+                <span class="custom-control-indicator"></span>
+                <span class="custom-control-description">I am interested in offering my services on this platform. Please send me more details.</span>
+              </label>
+            </div>
+          </div>
+          <div class="form-group row">
+            <geographic></geographic>
+            
           </div>
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" ng-click="closeModal()" class="btn" data-dismiss="modal">Cancel</button>
-        <button type="button" 
+        <button type="button" ng-click="closeModal()" class="btn" data-dismiss="modal">Close</button>
+        <button 
+          ng-show="!submitted"
+          type="button" 
           ng-disabled="contactForm.$invalid" 
           ng-click="submit(contactForm.$valid)" 
           class="btn btn-primary">Submit</button>
