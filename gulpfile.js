@@ -8,6 +8,7 @@ var uglify = require('gulp-uglify');
 var minifyHtml = require('gulp-minify-html');
 var gulpIf = require('gulp-if');
 var concat = require('gulp-concat');
+var jsonMinify = require('gulp-jsonminify');
 var pkg = require('./package.json');
 
 var outputDir;
@@ -22,7 +23,7 @@ if (env==='development') {
 var devPath = 'builds/development/';
 var jsSrcs = [devPath+'js/new-age.js', devPath+'js/app.js']; 
 var componentHtmlSrcs = [devPath+'components/**/*.html']; 
-
+var jsonSrcs = [devPath+'components/**/*.json'];
 
 // Set the banner content
 var banner = ['/*!\n',
@@ -85,6 +86,15 @@ gulp.task('images', function() {
            .pipe(gulpIf(env==='production',gulp.dest(outputDir+"img")));
 });
 
+gulp.task('json', function() {
+    gulp.src(jsonSrcs)
+        .pipe(gulpIf(env === 'production', jsonMinify()))
+        .pipe(gulpIf(env === 'production', gulp.dest(outputDir+'components') ))
+        .pipe(browserSync.reload({
+            stream: true
+        }));
+});
+
 // Copy vendor libraries from /node_modules into /vendor
 gulp.task('copy', function() {
     gulp.src(['node_modules/bootstrap/dist/**/*', '!**/npm.js', '!**/bootstrap-theme.*', '!**/*.map'])
@@ -120,7 +130,7 @@ gulp.task('copy', function() {
 })
 
 // Run everything
-gulp.task('default', ['less', 'minify-css', 'minify-js', 'minify-html', 'images', 'minify-component-html', 'copy']);
+gulp.task('default', ['less', 'minify-css', 'minify-js', 'minify-html', 'images', 'minify-component-html', 'copy', 'json']);
 
 // Configure the browserSync task
 gulp.task('browserSync', function() {
@@ -132,7 +142,7 @@ gulp.task('browserSync', function() {
 })
 
 // Dev task with browserSync
-gulp.task('dev', ['browserSync', 'less', 'minify-css', 'minify-js', 'minify-html', 'images', 'minify-component-html'], function() {
+gulp.task('dev', ['browserSync', 'less', 'minify-css', 'minify-js', 'minify-html', 'images', 'minify-component-html', 'json'], function() {
     gulp.watch(devPath+'less/*.less', ['less']);
     gulp.watch(devPath+'css/*.css', ['minify-css']);
     gulp.watch(devPath+'js/*.js', ['minify-js']);
