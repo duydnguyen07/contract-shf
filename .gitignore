@@ -1,3 +1,5 @@
 node_modules/
 .DS_Store
 builds/development/vendor/*
+builds/development/css/new-age.min.css
+builds/development/js/script.min.js
